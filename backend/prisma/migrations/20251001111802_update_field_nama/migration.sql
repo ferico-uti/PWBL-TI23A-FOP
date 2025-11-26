@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "tb_user" ALTER COLUMN "nama" SET DATA TYPE VARCHAR(100);
