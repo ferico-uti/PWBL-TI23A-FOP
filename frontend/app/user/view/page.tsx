@@ -1,11 +1,29 @@
 "use client";
 
-import React from "react";
 // import file "user.module.css"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import styles from "@/styles/user.module.css";
-import useSWR from "swr";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
+import useSWR from "swr";
 
 // buat fetcher (variabel untuk ambil data dari API)
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -19,10 +37,23 @@ interface ModelUser {
 }
 
 export default function ViewUserPage() {
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     "http://localhost:3001/api/user",
     fetcher
   );
+
+  // buat fungsi untuk hapus data
+  const deleteData = async (id: number) => {
+    // hapus data dengan axios
+    // ref: https://axios-http.com/docs/intro
+
+    await axios.delete(
+      `http://localhost:3001/api/user/${id}`
+    );   
+
+    // refresh data
+    mutate(data);
+  };
 
   // buat variabel
   // const jurusan = "TI";
@@ -50,9 +81,11 @@ export default function ViewUserPage() {
         {/* jika error saat pengambilan data dari API */}
         {error ? (
           <div className="text-center">Gagal Ambil Data</div>
-        ) : 
-        // jika tidak error saat pengambilan data dari API
-        (
+        ) : (
+          // jika tidak error saat pengambilan data dari API
+          // buat komponen tabel dengan shadcn
+          // ref: https://ui.shadcn.com/docs/components/table
+
           <Table>
             {/* buat judul tabel */}
             <TableHeader>
@@ -72,11 +105,10 @@ export default function ViewUserPage() {
                     Mohon Tunggu ...
                   </TableCell>
                 </TableRow>
-              ) : 
-              // tampilkan data
-              (
+              ) : (
+                // tampilkan data
                 data &&
-                data.user.map((item: ModelUser) => (                  
+                data.user.map((item: ModelUser) => (
                   <TableRow key={item.id}>
                     <TableCell className="text-center">
                       {/* buat tombol edit */}
@@ -85,12 +117,38 @@ export default function ViewUserPage() {
                       </button>
 
                       {/* buat tombol hapus */}
-                      <button className={styles.btn_delete}>
-                        <Trash size={16} color="#fff" />
-                      </button>
+                      {/* buat komponen alert dialog */}
+                      {/* ref: https://ui.shadcn.com/docs/components/alert-dialog */}
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger className={styles.btn_delete}>
+                          <Trash size={16} color="#fff" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Konfirmasi Hapus Data User
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Nama User : {item.nama} Ingin Dihapus ?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Tidak</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                deleteData(item.id);
+                              }}>
+                              Ya
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                     <TableCell>{item.nama}</TableCell>
-                    <TableCell className="text-center">{item.username}</TableCell>
+                    <TableCell className="text-center">
+                      {item.username}
+                    </TableCell>
                     <TableCell className="text-center">**********</TableCell>
                   </TableRow>
                 ))
