@@ -15,4 +15,4 @@
 ## Deskripsi Materi
 
 - 26/11/2025 - View Data User dengan Tabel ShadCN.
-- 27/11/2025 - Delete Data.
+- 28/11/2025 - Delete Data.
