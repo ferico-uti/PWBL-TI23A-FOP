@@ -23,6 +23,7 @@ import {
 import styles from "@/styles/user.module.css";
 import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
+import { toast } from "sonner";
 import useSWR from "swr";
 
 // buat fetcher (variabel untuk ambil data dari API)
@@ -47,12 +48,26 @@ export default function ViewUserPage() {
     // hapus data dengan axios
     // ref: https://axios-http.com/docs/intro
 
-    await axios.delete(
-      `http://localhost:3001/api/user/${id}`
-    );   
+    try {
+      const response = await axios.delete(
+        `http://localhost:3001/api/user/${id}`
+      );
 
-    // refresh data
-    mutate(data);
+      // tampilkan sonner (response)
+      // ref: https://ui.shadcn.com/docs/components/sonner
+
+      // jika success == true
+      if (response.data.meta_data.success) {
+        toast.success(response.data.meta_data.message);
+      }
+      // jika success == false
+      else {
+        toast.error(response.data.meta_data.message);
+      }
+    } finally {
+      // refresh data
+      mutate(data);
+    }
   };
 
   // buat variabel
@@ -67,8 +82,11 @@ export default function ViewUserPage() {
     //   <div>{`Jurusan : ${jurusan} Kelas : ${kelas}`}</div>
     // </div>
 
+    
     // buat section
     <section>
+      {/* buat title */}
+      <title>View Data User</title>
       {/* area navigasi tombol */}
       <nav className="flex justify-center md:justify-end sm:justify-start">
         <button className={`${styles.btn_primary} rounded-full`}>
@@ -119,7 +137,7 @@ export default function ViewUserPage() {
                       {/* buat tombol hapus */}
                       {/* buat komponen alert dialog */}
                       {/* ref: https://ui.shadcn.com/docs/components/alert-dialog */}
-                      
+
                       <AlertDialog>
                         <AlertDialogTrigger className={styles.btn_delete}>
                           <Trash size={16} color="#fff" />
