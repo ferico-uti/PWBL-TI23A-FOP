@@ -23,6 +23,7 @@ import {
 import styles from "@/styles/user.module.css";
 import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -38,6 +39,7 @@ interface ModelUser {
 }
 
 export default function ViewUserPage() {
+  // buat hook useRouter
   const { data, error, isLoading, mutate } = useSWR(
     "http://localhost:3001/api/user",
     fetcher
@@ -82,16 +84,16 @@ export default function ViewUserPage() {
     //   <div>{`Jurusan : ${jurusan} Kelas : ${kelas}`}</div>
     // </div>
 
-    
+
     // buat section
     <section>
       {/* buat title */}
       <title>View Data User</title>
       {/* area navigasi tombol */}
       <nav className="flex justify-center md:justify-end sm:justify-start">
-        <button className={`${styles.btn_primary} rounded-full`}>
+        <Link href="/user/add" className={`${styles.btn_primary} rounded-full`}>
           Tambah Data
-        </button>
+        </Link>        
       </nav>
 
       {/* area konten */}
