@@ -29,6 +29,13 @@ export default function AddUserPage() {
   const [errorPassword, setErrorPassword] = useState(false);
   const [errorRepassword, setErrorRepassword] = useState(false);
 
+  // buat state untuk error password dan repassword (jika karakter < 6)
+  const [errorPasswordLength, setErrorPasswordLength] = useState(false);
+  const [errorRepasswordLength, setErrorRepasswordLength] = useState(false)
+
+  // buat state untuk error password dan repassword (jika tidak sama)
+  const [errorPasswordRepasswordMatch, setErrorPasswordRepasswordMatch] = useState(false);
+
 
   // buat fungsi untuk simpan data
   const saveData = async () => {
@@ -43,7 +50,7 @@ export default function AddUserPage() {
     setErrorPassword(errPassword);
     setErrorRepassword(errRepassword);
 
-    // cek error setiap komponen
+    // cek error setiap komponen jika tidak diisi
     const hasError =
       errNama ||
       errUsername ||
@@ -55,7 +62,38 @@ export default function AddUserPage() {
       return;
     }
 
-    // jika tidak error (seluruh komponen sudah diisi)
+    // buat variabel untuk cek password dan repassword (jika karakter < 6)
+    const errPasswordLength = formPassword.length < 6
+    const errRepasswordLength = formRepassword.length < 6;
+
+    // set state error password dan repassword (jumlah karakter < 6)
+    setErrorPasswordLength(errPasswordLength);
+    setErrorRepasswordLength(errRepasswordLength);
+
+    // cek error password dan repassword (jumlah karakter < 6)
+    const hasErrorLength =
+      errPasswordLength || errRepasswordLength;
+
+    // jika password dan repassword < 6 karakter
+    if (hasErrorLength) {
+      return;
+    }
+
+    // buat variabel untuk cek password dan repassword (jika tidak sama)
+    const errPasswordRepasswordMatch = formPassword !== formRepassword
+
+    // set state error password dan repassword (jika tidak sama)
+    setErrorPasswordRepasswordMatch(errPasswordRepasswordMatch);
+
+    // cek error password dan repassword (jika tidak sama)
+    const hasPasswordRepasswordMatch = errPasswordRepasswordMatch;
+
+    // jika password dan repassword (jika tidak sama)
+    if (hasPasswordRepasswordMatch) {
+      return;
+    }
+
+    // jika tidak error (seluruh komponen sudah diisi, password dan repassword (> 6 karakter) dan sama / cocok)
     // kirim data ke service POST (backend)
     const response = await axios.post("http://localhost:3001/api/user", {
       nama: formNama,
@@ -126,6 +164,11 @@ export default function AddUserPage() {
           {errorPassword && (
             <Label className={styles.error}><Info size={14} /> Password User Harus Diisi !</Label>
           )}
+
+          {/* tampilkan error jika password user < 6 karakter */}
+          {errorPasswordLength && (
+            <Label className={styles.error}><Info size={14} /> Password Min. 6 Karakter !</Label>
+          )}
         </section>
 
         {/* area konfirmasi password */}
@@ -139,12 +182,22 @@ export default function AddUserPage() {
           {errorRepassword && (
             <Label className={styles.error}><Info size={14} /> Konfirmasi Password User Harus Diisi !</Label>
           )}
+
+          {/* tampilkan error jika konfirmasi password user < 6 karakter */}
+          {errorRepasswordLength && (
+            <Label className={styles.error}><Info size={14} /> Konfirmasi Password Min. 6 Karakter !</Label>
+          )}
+
+          {/* tampilkan error jika password dan konfirmasi password user tidak sama */}
+          {errorPasswordRepasswordMatch && (
+            <Label className={styles.error}><Info size={14} /> Password dan Konfirmasi Password Tidak Sama !</Label>
+          )}
         </section>
 
         {/* area button */}
         <section>
           <Button className='rounded-full w-[125px] mr-2.5' onClick={saveData}>Simpan</Button>
-          <Button variant="secondary" className='rounded-full w-[125px] ml-2.5' onClick={()=>router.back()}>Batal</Button>
+          <Button variant="secondary" className='rounded-full w-[125px] ml-2.5' onClick={() => router.back()}>Batal</Button>
         </section>
 
       </article>
