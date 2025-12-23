@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { API_USER } from "@/lib/strings";
 import styles from "@/styles/user.module.css";
 import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
@@ -40,8 +41,9 @@ interface ModelUser {
 
 export default function ViewUserPage() {
   // buat hook useRouter
+  // API_USER diambil dari file lib/strings.ts
   const { data, error, isLoading, mutate } = useSWR(
-    "http://localhost:3001/api/user",
+    API_USER,
     fetcher
   );
 
@@ -51,8 +53,9 @@ export default function ViewUserPage() {
     // ref: https://axios-http.com/docs/intro
 
     try {
+      // API_USER diambil dari file lib/strings.ts
       const response = await axios.delete(
-        `http://localhost:3001/api/user/${id}`
+        `${API_USER}/${id}`
       );
 
       // tampilkan sonner (response)
@@ -93,7 +96,7 @@ export default function ViewUserPage() {
       <nav className="flex justify-center md:justify-end sm:justify-start">
         <Link href="/user/add" className={`${styles.btn_primary} rounded-full`}>
           Tambah Data
-        </Link>        
+        </Link>
       </nav>
 
       {/* area konten */}

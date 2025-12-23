@@ -3,6 +3,8 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { filterNama, filterPassword, filterUsername } from '@/lib/scripts'
+import { API_USER } from '@/lib/strings'
 import styles from "@/styles/user.module.css"
 import axios from 'axios'
 import { Info } from 'lucide-react'
@@ -95,7 +97,8 @@ export default function AddUserPage() {
 
     // jika tidak error (seluruh komponen sudah diisi, password dan repassword (> 6 karakter) dan sama / cocok)
     // kirim data ke service POST (backend)
-    const response = await axios.post("http://localhost:3001/api/user", {
+    // API_USER diambil dari file lib/strings.ts
+    const response = await axios.post(API_USER, {
       nama: formNama,
       username: formUsername,
       password: formPassword,
@@ -132,7 +135,13 @@ export default function AddUserPage() {
           <Label htmlFor="txt_nama" className='mb-2.5'>Nama User</Label>
           <Input type="text" id="txt_nama" placeholder="Isi Nama User" maxLength={100}
             value={formNama}
-            onChange={(text) => setFormNama(text.target.value)} />
+            onChange={(text) => {
+              // buat variabel untuk filterNama
+              // filterNama diambil dari file lib/scripts.ts
+              const result = filterNama(text.target.value);
+              // simpan data input ke state
+              setFormNama(result);
+            }} />
 
           {/* tampilkan error jika nama user belum diisi */}
           {errorNama && (
@@ -145,7 +154,13 @@ export default function AddUserPage() {
           <Label htmlFor="txt_username" className='mb-2.5'>Username User</Label>
           <Input type="text" id="txt_username" placeholder="Isi Username User" maxLength={20}
             value={formUsername}
-            onChange={(text) => setFormUsername(text.target.value)} />
+            onChange={(text) => {
+              // buat variabel untuk filterUsername
+              // filterUsername diambil dari file lib/scripts.ts
+              const result = filterUsername(text.target.value);
+              // simpan data input ke state
+              setFormUsername(result);
+            }} />
 
           {/* tampilkan error jika username user belum diisi */}
           {errorUsername && (
@@ -158,7 +173,13 @@ export default function AddUserPage() {
           <Label htmlFor="txt_password" className='mb-2.5'>Password User</Label>
           <Input type="password" id="txt_password" placeholder="Isi Password User" maxLength={60}
             value={formPassword}
-            onChange={(text) => setFormPassword(text.target.value)} />
+            onChange={(text) => {
+              // buat variabel untuk filterPassword
+              // filterPassword diambil dari file lib/scripts.ts
+              const result = filterPassword(text.target.value);
+              // simpan data input ke state
+              setFormPassword(result);
+            }} />
 
           {/* tampilkan error jika password user belum diisi */}
           {errorPassword && (
@@ -176,7 +197,13 @@ export default function AddUserPage() {
           <Label htmlFor="txt_repassword" className='mb-2.5'>Konfirmasi Password User</Label>
           <Input type="password" id="txt_repassword" placeholder="Isi Konfirmasi Password User" maxLength={60}
             value={formRepassword}
-            onChange={(text) => setFormRepassword(text.target.value)} />
+            onChange={(text) => {
+              // buat variabel untuk filterPassword
+              // filterPassword diambil dari file lib/scripts.ts
+              const result = filterPassword(text.target.value);
+              // simpan data input ke state
+              setFormRepassword(result);
+            }} />
 
           {/* tampilkan error jika konfirmasi password user belum diisi */}
           {errorRepassword && (
