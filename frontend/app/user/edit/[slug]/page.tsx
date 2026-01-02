@@ -46,34 +46,33 @@ export default function EditUserPage() {
   // buat state untuk error password dan repassword (jika tidak sama)
   const [errorPasswordRepasswordMatch, setErrorPasswordRepasswordMatch] = useState(false);
 
-  // panggil service detail user sesuai slug (id)
+  // tampilkan detail data user berdasarkan slug
   const { data, error, isLoading } = useSWR(
     slug ? `${API_USER}/${slug}` : null,
-    fetcher
+    fetcher,
+    {
+      // jika data berhasil diambil, simpan ke state masing2 komponen
+      onSuccess: (data) => {
+        if (data?.user) {
+          setFormNama(data?.user.nama ?? "");
+          setFormUsername(data?.user.username ?? "");
+          setFormPassword("**********");
+          setFormRepassword("**********");
+        }
+      },
+    }
   );
 
-  // tampilkan detail data ke dalam komponen
+  // useEffect untuk handle redirect jika error
   useEffect(() => {
-    // saat loading
     if (isLoading) return;
 
-    // jika request error atau data user tidak ditemukan
-    if (error || !data?.user) {
+    if (error || (data && !data.user)) {
       router.replace("/404");
-      return;
     }
-
-    // jika data user ditemukan
-    const user = data.user;
-
-    // tampilkan data ke dalam form
-    setFormNama(user.nama ?? "");
-    setFormUsername(user.username ?? "");
-    setFormPassword("**********");
-    setFormRepassword("**********");
-   
-
   }, [data, error, isLoading, router]);
+
+  
 
   // buat fungsi untuk ubah data
   const editData = async () => {
