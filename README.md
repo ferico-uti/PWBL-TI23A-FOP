@@ -19,3 +19,4 @@
 - 03/12/2025 - Feedback Response (Delete Data)
 - 17/12/2025 - Form Validation (Input)
 - 19/12/2025 - Form Validation (Password)
+- 02/01/2026 - Detail & Edit Data

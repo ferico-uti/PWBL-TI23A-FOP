@@ -8,11 +8,19 @@ import { API_USER } from '@/lib/strings'
 import styles from "@/styles/user.module.css"
 import axios from 'axios'
 import { Info } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import useSWR from 'swr'
 
-export default function AddUserPage() {
+// buat variabel fetcher
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+export default function EditUserPage() {
+  // buat hook useParams
+  const params = useParams()
+  const slug = params.slug;
+
   // buat router untuk navigasi antar page
   const router = useRouter();
 
@@ -38,9 +46,37 @@ export default function AddUserPage() {
   // buat state untuk error password dan repassword (jika tidak sama)
   const [errorPasswordRepasswordMatch, setErrorPasswordRepasswordMatch] = useState(false);
 
+  // panggil service detail user sesuai slug (id)
+  const { data, error, isLoading } = useSWR(
+    slug ? `${API_USER}/${slug}` : null,
+    fetcher
+  );
 
-  // buat fungsi untuk simpan data
-  const saveData = async () => {
+  // tampilkan detail data ke dalam komponen
+  useEffect(() => {
+    // saat loading
+    if (isLoading) return;
+
+    // jika request error atau data user tidak ditemukan
+    if (error || !data?.user) {
+      router.replace("/404");
+      return;
+    }
+
+    // jika data user ditemukan
+    const user = data.user;
+
+    // tampilkan data ke dalam form
+    setFormNama(user.nama ?? "");
+    setFormUsername(user.username ?? "");
+    setFormPassword("**********");
+    setFormRepassword("**********");
+   
+
+  }, [data, error, isLoading, router]);
+
+  // buat fungsi untuk ubah data
+  const editData = async () => {
     const errNama = formNama === "";
     const errUsername = formUsername === "";
     const errPassword = formPassword === "";
@@ -96,9 +132,9 @@ export default function AddUserPage() {
     }
 
     // jika tidak error (seluruh komponen sudah diisi, password dan repassword (> 6 karakter) dan sama / cocok)
-    // kirim data ke service POST (backend)
+    // kirim data ke service PUT (backend)
     // API_USER diambil dari file lib/strings.ts
-    const response = await axios.post(API_USER, {
+    const response = await axios.put(`${API_USER}/${slug}`, {
       nama: formNama,
       username: formUsername,
       password: formPassword,
@@ -109,12 +145,6 @@ export default function AddUserPage() {
     // jika success == true
     if (response.data.meta_data.success) {
       toast.success(response.data.meta_data.message);
-
-      // kosongkan isi komponen
-      setFormNama("");
-      setFormUsername("");
-      setFormPassword("");
-      setFormRepassword("");
     }
     // jika success == false
     else {
@@ -126,7 +156,7 @@ export default function AddUserPage() {
     // buat section
     <section>
       {/* buat title */}
-      <title>Tambah Data User</title>
+      <title>Ubah Data User</title>
       {/* buat grid column */}
       <article className='grid sm:grid-cols-2 grid-cols-1 gap-4'>
 
@@ -223,7 +253,7 @@ export default function AddUserPage() {
 
         {/* area button */}
         <section>
-          <Button className='rounded-full w-[125px] mr-2.5' onClick={saveData}>Simpan</Button>
+          <Button className='rounded-full w-[125px] mr-2.5' onClick={editData}>Ubah</Button>
           <Button variant="secondary" className='rounded-full w-[125px] ml-2.5' onClick={() => router.back()}>Batal</Button>
         </section>
 

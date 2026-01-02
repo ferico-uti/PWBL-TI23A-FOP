@@ -25,6 +25,7 @@ import styles from "@/styles/user.module.css";
 import axios from "axios";
 import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -41,6 +42,8 @@ interface ModelUser {
 
 export default function ViewUserPage() {
   // buat hook useRouter
+  const router = useRouter();
+
   // API_USER diambil dari file lib/strings.ts
   const { data, error, isLoading, mutate } = useSWR(
     API_USER,
@@ -135,7 +138,7 @@ export default function ViewUserPage() {
                   <TableRow key={item.id}>
                     <TableCell className="text-center">
                       {/* buat tombol edit */}
-                      <button className={styles.btn_edit}>
+                      <button className={styles.btn_edit} onClick={() => router.push(`/user/edit/${item.id}`)}>
                         <Pencil size={16} color="#a51c31" />
                       </button>
 
